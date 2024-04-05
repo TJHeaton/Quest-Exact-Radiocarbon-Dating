@@ -4,22 +4,28 @@
 # https://www.color-hex.com/color-palette/49436
 # and plot 1 sigma intervals on the curve and the observations
 
-# Specific colours I have used for histograms are:
-scalefac <- 1.5
+set.seed(17)
+
+# Calibration of a single sample from Thera
+radiocarbon_age <- 3350 
+radiocarbon_sigma <- 10
+
+# Specific parameters
 BC <- TRUE
 MookConvention <- TRUE
-set.seed(17)
 prob_scale_fac <- 3 # How high to scale posterior probability 
-
-# Show calibration against the curve
-IntCal20 <- read.csv("intcal20.csv", header = TRUE)
 Mult_SigmaInterval <- 1 # Do we want 1 sigma or two sigma
 
+# Calibrate vs IntCal20
+IntCal20 <- read.csv("intcal20.csv", header = TRUE)
 IntCal20$C14Upper <- IntCal20$X14C.age + Mult_SigmaInterval * IntCal20$Sigma
 IntCal20$C14Lower <- IntCal20$X14C.age - Mult_SigmaInterval * IntCal20$Sigma
 IntCal20$BC <- -(1950.5 - IntCal20$CAL.BP) 
+calcurve <- IntCal20 
 
-# cal_age are the calendar ages you are scanning over 
+
+# Function to calibrate an observed radiocarbon age 
+# Here - cal_age are the calendar ages you are scanning over 
 calib <- function(cal_age, radiocarbon_age, radiocarbon_sigma, calcurve) {
   posterior_likelihood <- approx(calcurve[,1], 
                                  dnorm(radiocarbon_age, 
@@ -30,21 +36,15 @@ calib <- function(cal_age, radiocarbon_age, radiocarbon_sigma, calcurve) {
   return(posterior_likelihood)
 }
 
-# Calibrate vs IntCal20
-calcurve <- IntCal20 
-
-
-# Calibration of a single sample from Thera
-radiocarbon_age <- 3350 
-radiocarbon_sigma <- 10
 
 radiocarbon_age_grid <- seq(radiocarbon_age - 4*radiocarbon_sigma, 
                             radiocarbon_age + 4*radiocarbon_sigma, 
                             by = 1)
 
-min.age <- radiocarbon_age - 2000
-max.age <- radiocarbon_age + 2000
-cal_age_grid <- seq(min.age, max.age, by = 1)
+# Choose a suitable set ofcalendar ages to scan over 
+min_cal_age <- radiocarbon_age - 2000
+max_cal_age <- radiocarbon_age + 2000
+cal_age_grid <- seq(min_cal_age, max_cal_age, by = 1)
 
 # Calibrate vs IntCal20
 posterior_probs <- calib(cal_age = cal_age_grid, 
@@ -53,9 +53,16 @@ posterior_probs <- calib(cal_age = cal_age_grid,
                calcurve = calcurve)
 # Normalise the posterior probabilities
 posterior_probs <- posterior_probs/sum(posterior_probs)
+cum_posterior_prob <- cumsum(posterior_probs)
 max_posterior_prob <- max(posterior_probs)
 
-cal_age_lim_plot <- c(3340.1, 3829.9)
+# Adaptively choose limits on plots
+cal_age_lim_plot <- c(
+  cal_age_grid[max(which(cum_posterior_prob < 1e-10))] - 100,
+  cal_age_grid[min(which(cum_posterior_prob > (1 - 1e-10)))] + 100
+  )
+
+
 radiocarbon_age_lim_plot <- (
   range(calcurve$X14C.age[calcurve$CAL.BP < cal_age_lim_plot[2] & calcurve$CAL.BP > cal_age_lim_plot[1]]) + c(-2,2)*mean(calcurve$Sigma)
 )
