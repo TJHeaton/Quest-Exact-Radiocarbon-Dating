@@ -1,0 +1,80 @@
+ // Delta_R values updated for Marine20
+ Options()
+ {
+  Resolution=1;
+  kIterations=20000;
+ };
+ Phase()
+ {
+  Curve("Marine20","Marine20.14c");
+  Delta_R("LocalMarine",-133,33);
+  Curve("IntCal20","IntCal20.14c");
+  Outlier_Model("General",T(5),U(0,4),"t");
+  Sequence("pipe-facets")
+  {
+   C_Date("AD 1620", 1620, 0.25);
+   Date("deaths");
+   C_Date("Bishop's stables", 1754, 0.25);
+  };
+  Phase("Burial pits")
+  {
+   Phase("F514")
+   {
+    V_Sequence("Sk9")
+    {
+     Mix_Curve("Mixed9","IntCal20","LocalMarine", 7.0, 10);
+     R_Date("SUERC-54229", 397, 30)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(5, 2);
+     Date("=deaths");
+    };
+   };
+   Phase("F512")
+   {
+    V_Sequence("Sk16A")
+    {
+     Mix_Curve("Mixed16A","IntCal20","LocalMarine", 4.7, 10);
+     R_Date("SUERC-54228", 389, 30)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(4, 2);
+     Date("=deaths");
+    };
+    V_Sequence("Sk12")
+    {
+     Mix_Curve("Mixed12LLM1","IntCal20","LocalMarine", 11.6, 10);
+     R_Date("SUERC-58783", 358, 30)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(10, 1);
+     Mix_Curve("Mixed12LL3M","IntCal20","LocalMarine", 17.3, 10);
+     R_Date("SUERC-58784", 358, 28)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(6, 1);
+     Date("=deaths");
+    };
+    V_Sequence("Sk21")
+    {
+     Mix_Curve("Mixed21LLM1","IntCal20","LocalMarine", 9.3, 10);
+     R_Date("SUERC-58788", 298, 30)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(10, 1);
+     Mix_Curve("Mixed21LL3M","IntCal20","LocalMarine", 11.6, 10);
+     R_Date("SUERC-58789", 292, 27)
+     {
+      Outlier("General", 0.05);
+     };
+     Gap(8, 1);
+     Date("=deaths");
+    };
+   };
+  };
+ };
