@@ -1,5 +1,10 @@
 # Perform a chi-squared wiggle-match of Lake Araisi timber fortress
 
+# Plotting parameters
+cex_lab <- 1
+y_lab_line <- 3.2
+
+
 # Read in Araisi data (from Meadows paper)
 wiggle_data <- read.csv("AraisiData/AraisiWiggleMatch.csv")
 # Reverse so that oldest dates are at the start

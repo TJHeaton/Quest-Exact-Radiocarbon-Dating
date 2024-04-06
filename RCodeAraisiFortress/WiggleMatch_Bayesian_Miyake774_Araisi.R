@@ -1,30 +1,13 @@
-# 28th April 2023
-# Create plots for Nature perspective to show
-# variable precision based on calibration curve
+# Perform a Bayesian wiggle-match of Lake Araisi timber fortress
+# against MiyakeCal curve
 
-################################
-# Plots required are:
-# a) Calibration of single date of thera
-# b) Calibration over Hallstat plateau (two 14C dates with same precision)
-# c) Wiggle match over Hallstat plateau
+oldpar <- par(no.readonly = TRUE)
 
-# For this plot, I have used
-# Curve rgb(0,0,1,.5)
-# NOTE: IT IS DARKER THAN INTCAL20 FOR FIGS 1 and 2 (have chosen alpha = 0.5)
-
-# Posterior for wiggle match is in red
-# rgb(1,0,0,.5)
-# NOTE: AGAIN THIS IS DARKER WITH alpha = 0.5 than Figures 1 and 2
-
-# If you need another colour (for e.g. calibration of individual samples in animation) 
-# then palette suggests 
-# Yellow rgb(240,228,66, (0.2*255), maxColorValue = 255)
-
-
-#library(fda)
-#library("rstan")
-#library(mvtnorm) # To sample from a mvn for the noise on t 
-#library(Matrix)
+# Plotting parameters
+cex_lab <- 1
+y_lab_line <- 3.2
+label_adj <- -1
+dens_plot_scale <- 0.8 # How far up you want the density plot to go
 
 AD <- TRUE
 MookConvention <- TRUE
@@ -41,7 +24,8 @@ MiyakeCal$AD <- (1950 - MiyakeCal$calage)
 # Calibrate vs MiyakeCal
 calcurve <- MiyakeCal 
 
-wiggle_data <- read.csv("AraisiWiggleMatch.csv")
+# Read in Araisi data (from Meadows paper)
+wiggle_data <- read.csv("AraisiData/AraisiWiggleMatch.csv")
 
 # Now create a function which calibrates multiple samples in a wiggle match
 # Arguments:
@@ -74,19 +58,20 @@ for(i in 1:ntheta) {
 probs <- probs/sum(probs)
 maxcalprob <- max(probs)
 
-# Check we get annual precision
+# Check we get annual precision (i.e., greater than 95% posterior probability in a single year)
 probs[(which.max(probs) - 2):(which.max(probs) + 2)]
-# which cal yr BP it is
-fromto[which.max(probs)]
+(max_cal_age_prob <- max(probs)) # In this case 99.999%
+(max_cal_age_fit <- 1950 - fromto[which.max(probs)]) # In this case 782 cal AD
 
 # Now make the plot
-Miyake <- 1950 - 774.5 # c(774.5, 993.5)
+Miyake <- 1950 - 774.5
 ylimplot <- c(1088, 1370)
 xlimplot <- 774.5 + c(-50,50)
 
-par(mar = c(3, 4.4, 0.5, 0.5) + 0.1)
+par(mar = c(3, 4.4, 4, 0.5) + 0.1)
 plot(MiyakeCal$AD, MiyakeCal$c14age,
      xlab = "", ylab = "", 
+     main = expression("Bayesian wigglematch of Lake Āraiši against MiyakeCal"),
      las = 1,  cex.lab = 1.3,
      xaxs="i", yaxs = "i", 
      type = "n",
@@ -101,8 +86,6 @@ xtick<-seq(700, 900, by=1)
 ytick<-seq(1000, 1400, by=10)
 axis(side=1, at=xtick, labels = FALSE, lwd = 0.5, tck = -0.015)
 axis(side=2, at=ytick, labels = FALSE, lwd = 0.5, tck = -0.015)
-mtext(LETTERS[4], side = 3, adj = labadj, cex = 4/3, font = 2,
-      line = 4/3 * label_adj, outer = FALSE)
 
 
 lines(MiyakeCal$AD, MiyakeCal$c14age, col = "blue")
@@ -142,7 +125,7 @@ if(AD) {
 }
 pol[,1] <- pol[,1]
 # Rescale to fit on the graph
-pol[,2] <- pol[,2] * 0.8 * (ylimplot[2] - ylimplot[1]) / maxcalprob
+pol[,2] <- pol[,2] * dens_plot_scale * (ylimplot[2] - ylimplot[1]) / maxcalprob
 pol[,2] <- pol[,2] + ylimplot[1]
 polygon(pol, col = rgb(1,0,0,.5))
 
@@ -150,13 +133,13 @@ legend("topright", legend = c("MiyakeCal"),
        lty = c(-1), pch = c(15), lwd = 2,
        col = c(rgb(0,0,1,.5)), cex = 4/3, pt.cex = 2)
 
-# mtext(paste0("(", LETTERS[3], ")"), side = 3, adj = 0.05, cex = 1.3, 
-#       line = -1.3)
+
 
 text(x = 782, y = max(pol[,2]), 
      labels = "99.9% 782 cal AD", 
      cex = 4/3, pos = 4)
 
+# Create inset plot showing zoomed in AD 774 Miyake period
 # Adjust plot to create subplot 
 u <- c(738, 770, 1120, 1245)
 v <- c(
@@ -188,7 +171,8 @@ polygon(tempx, tempy,
         col = rgb(86, 180, 233, max = 255, alpha = 75))
 
 
-
+# Revert to old par
+par(oldpar)
 
 
 

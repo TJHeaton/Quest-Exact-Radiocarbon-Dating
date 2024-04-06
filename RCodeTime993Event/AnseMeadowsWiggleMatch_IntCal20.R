@@ -7,6 +7,7 @@
 AD <- TRUE
 MookConvention <- TRUE
 set.seed(17)
+dens_plot_scale <- 0.8
 
 
 Mult_SigmaInterval <- 1 # Do we want 1 sigma or two sigma
@@ -126,7 +127,7 @@ if(AD) {
 }
 pol[,1] <- pol[,1]
 # Rescale to fit on the graph
-pol[,2] <- pol[,2] * 0.8 * (ylimplot[2] - ylimplot[1]) / maxcalprob
+pol[,2] <- pol[,2] * dens_plot_scale * (ylimplot[2] - ylimplot[1]) / maxcalprob
 pol[,2] <- pol[,2] + ylimplot[1]
 polygon(pol, col = rgb(1,0,0,.5))
 
