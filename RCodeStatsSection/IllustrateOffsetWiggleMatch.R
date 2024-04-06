@@ -1,4 +1,4 @@
-# Show effect of calibrtig with and without shared offset
+# Show effect of calibrating with and without shared offset
 
 # Use colour-blind friendly palette from
 # https://www.color-hex.com/color-palette/49436
