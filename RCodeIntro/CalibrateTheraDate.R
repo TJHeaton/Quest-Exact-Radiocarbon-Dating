@@ -6,6 +6,9 @@
 
 set.seed(17)
 
+# Store oldpar so do not change after running in main environment 
+oldpar <- par(no.readonly = TRUE)
+
 # Calibration of a single sample from Thera
 radiocarbon_age <- 3350 
 radiocarbon_sigma <- 10
@@ -13,7 +16,8 @@ radiocarbon_sigma <- 10
 # Specific parameters
 BC <- TRUE
 MookConvention <- TRUE
-prob_scale_fac <- 3 # How high to scale posterior probability 
+dens_plot_scale_cal_age <- 0.2 # How far up you want the posterior calendar age density plot to go
+dens_plot_scale_c14_age <- 0.1 # How far up you want the c14 age density plot to go
 Mult_SigmaInterval <- 1 # Do we want 1 sigma or two sigma
 
 # Calibrate vs IntCal20
@@ -68,9 +72,6 @@ radiocarbon_age_lim_plot <- (
 )
 
 
-# Store oldpar so do not change after running in main environment 
-oldpar <- par(no.readonly = TRUE)
-
 par(mar = c(5, 4.8, 2, 2) + 0.1)
 plot(cal_age_grid, posterior_probs, type="n", 
      xlab = "Calendar Age (cal BC)", ylab = "", 
@@ -104,14 +105,14 @@ if(BC) {
 }
 
 # Rescale to fit on the graph
-pol[,2] <- pol[,2] * (radiocarbon_age_lim_plot[2] - radiocarbon_age_lim_plot[1]) / (prob_scale_fac * max_posterior_prob)
+pol[,2] <- pol[,2] * dens_plot_scale_cal_age * (radiocarbon_age_lim_plot[2] - radiocarbon_age_lim_plot[1]) / (max_posterior_prob)
 pol[,2] <- pol[,2] + radiocarbon_age_lim_plot[1]
 polygon(pol, col= rgb(1,0,1,.2))
 
 # Create a polygon to represent density of the radiocarbon determination
 radpol <- cbind( c(0, dnorm(radiocarbon_age_grid, mean = radiocarbon_age, sd = radiocarbon_sigma), 0), 
                  c(min(radiocarbon_age_grid), radiocarbon_age_grid, max(radiocarbon_age_grid)))
-radpol[,1] <- radpol[,1] * 0.1 * (cal_age_lim_plot[2] - cal_age_lim_plot[1]) / max(radpol[,1])
+radpol[,1] <- radpol[,1] * dens_plot_scale_c14_age * (cal_age_lim_plot[2] - cal_age_lim_plot[1]) / max(radpol[,1])
 
 if(BC) {
   radpol[,1] <- -(1950.5 - cal_age_lim_plot[2] + radpol[,1])
