@@ -16,7 +16,7 @@ set.seed(17)
 Mult_SigmaInterval <- 1 # Do we want 1 sigma or two sigma
 
 # Wiggle matching Araisi Lake Fortress over a MiyakeCal curve
-MiyakeCal <- read.csv("CalibrationCurves/MiyakeCalCurve.csv", header = TRUE)
+MiyakeCal <- read.csv("CalibrationCurves/MiyakeCalAD774Curve.csv", header = TRUE)
 MiyakeCal$C14Upper <- MiyakeCal$c14age + Mult_SigmaInterval * MiyakeCal$c14sig
 MiyakeCal$C14Lower <- MiyakeCal$c14age - Mult_SigmaInterval * MiyakeCal$c14sig
 MiyakeCal$AD <- (1950 - MiyakeCal$calage) 
